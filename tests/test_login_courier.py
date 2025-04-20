@@ -7,7 +7,16 @@ from methods.courier_methods import CourierMethods
 class TestLoginCourier:
     @allure.title('Успешная авторизация созданного курьера c передачей всех обязательных полей')
     def test_successful_login_courier(self, generate_courier_data):
-        assert generate_courier_data['login_status_code'] == 200 and 'id' in generate_courier_data['login_body']
+        login_data = {
+            "login": generate_courier_data['login'],
+            "password": generate_courier_data['password']
+        }
+
+        with allure.step("Авторизуемся как курьер"):
+            response = CourierMethods.login_courier(login_data)
+            response_data = response.json()
+
+        assert response.status_code == 200 and "id" in response_data
 
     @allure.title('Получение ошибки при вводе некорректного логина')
     def test_login_with_wrong_login(self, generate_courier_data):

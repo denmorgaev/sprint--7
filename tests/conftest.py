@@ -2,18 +2,12 @@ import pytest
 import requests
 
 from data import Url, generate_courier_body
-from helper import register_new_courier_and_return_login_password
-from methods.courier_methods import CourierMethods
 
-
-@pytest.fixture(scope='function')
-def courier_methods():
-    return CourierMethods()
 
 @pytest.fixture(scope='function')
 def generate_courier_data():
     courier_data = generate_courier_body()
-    response = CourierMethods.create_courier(courier_data)
+    response = requests.post(f'{Url.base_url}{Url.courier_url}', json=courier_data)
     response_status_code = response.status_code
     response_body = response.json()
 
@@ -24,7 +18,7 @@ def generate_courier_data():
     login_response = requests.post(f'{Url.base_url}{Url.login_url}', json=login_payload)
     login_response_status_code = login_response.status_code
     login_response_body = login_response.json()
-    courier_id = login_response.json().get("id")
+    courier_id = login_response_body.get("id")
 
     yield {
         "create_status_code": response_status_code,
